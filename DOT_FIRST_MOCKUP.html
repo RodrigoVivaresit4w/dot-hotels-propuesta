@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOT FIRST — Hotel Management Platform</title>
+<link rel="icon" href="https://d1ofesossdj49a.cloudfront.net/c_2144/TT/favicon_83639.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#F9FAFB;color:#111827;font-size:14px}
+/* ── TOPBAR ── */
+.topbar{position:fixed;top:0;left:0;right:0;height:60px;background:#fff;border-bottom:1px solid #E5E7EB;z-index:1000;display:flex;align-items:center;padding:0 20px;gap:16px}
+.topbar-logo{display:flex;align-items:center;gap:10px;width:220px}
+.topbar-logo img{height:28px}
+.topbar-logo span{font-size:18px;font-weight:800;color:#111827;letter-spacing:-0.5px}
+.topbar-logo span em{color:#C8963E;font-style:normal}
+.topbar-breadcrumb{flex:1;font-size:13px;color:#6B7280}
+.topbar-breadcrumb strong{color:#111827;font-weight:600}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.topbar-badge{position:relative;cursor:pointer}
+.topbar-badge svg{width:22px;height:22px;stroke:#6B7280}
+.notif-dot{position:absolute;top:0;right:0;width:8px;height:8px;background:#DC2626;border-radius:50%;border:2px solid #fff}
+.topbar-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#C8963E,#a07030);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;cursor:pointer}
+.topbar-user{font-size:13px}
+.topbar-user div:first-child{font-weight:600;color:#111827}
+.topbar-user div:last-child{color:#6B7280;font-size:11px}
+/* ── SIDEBAR ── */
+.sidebar{position:fixed;top:60px;left:0;width:240px;bottom:32px;background:#111827;overflow-y:auto;z-index:900;display:flex;flex-direction:column}
+.sidebar-nav{flex:1;padding:12px 0}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 20px;cursor:pointer;color:#9CA3AF;font-size:13px;font-weight:500;transition:all .2s;border-left:3px solid transparent;user-select:none}
+.nav-item:hover{background:#1F2937;color:#F3F4F6}
+.nav-item.active{background:#1F2937;color:#F9FAFB;border-left-color:#C8963E}
+.nav-item svg{width:18px;height:18px;flex-shrink:0}
+.nav-section{padding:16px 20px 6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#4B5563}
+/* ── STATUS BAR ── */
+.statusbar{position:fixed;bottom:0;left:0;right:0;height:32px;background:#111827;z-index:1000;display:flex;align-items:center;padding:0 20px;gap:24px}
+.statusbar span{font-size:11px;color:#6B7280}
+.statusbar .dot{width:6px;height:6px;border-radius:50%;background:#059669;display:inline-block;margin-right:4px}
+.statusbar .dot.warn{background:#D97706}
+/* ── MAIN ── */
+.main{margin-left:240px;margin-top:60px;padding:24px;padding-bottom:48px;min-height:calc(100vh - 60px)}
+.screen{display:none}
+.screen.active{display:block}
+/* ── PAGE HEADER ── */
+.page-header{margin-bottom:24px}
+.page-title{font-size:22px;font-weight:800;color:#111827;letter-spacing:-0.5px}
+.page-sub{font-size:13px;color:#6B7280;margin-top:2px}
+/* ── KPI GRID ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;margin-bottom:24px}
+.kpi-card{background:#fff;border-radius:12px;padding:18px;border:1px solid #E5E7EB;position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:#C8963E}
+.kpi-card.green::before{background:#059669}
+.kpi-card.blue::before{background:#2563EB}
+.kpi-card.red::before{background:#DC2626}
+.kpi-card.purple::before{background:#7C3AED}
+.kpi-card.teal::before{background:#0891B2}
+.kpi-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#6B7280;margin-bottom:8px}
+.kpi-value{font-size:26px;font-weight:800;color:#111827;letter-spacing:-1px}
+.kpi-change{font-size:11px;margin-top:4px}
+.kpi-change.up{color:#059669}
+.kpi-change.down{color:#DC2626}
+/* ── CHART CARD ── */
+.chart-card{background:#fff;border-radius:12px;border:1px solid #E5E7EB;padding:20px;margin-bottom:24px}
+.chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.chart-title{font-size:15px;font-weight:700;color:#111827}
+.chart-subtitle{font-size:12px;color:#6B7280;margin-top:2px}
+.chart-legend{display:flex;gap:16px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:#6B7280}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+/* ── CARDS / GRID ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:24px}
+.card{background:#fff;border-radius:12px;border:1px solid #E5E7EB;padding:20px}
+.card-title{font-size:14px;font-weight:700;color:#111827;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+/* ── TABLES ── */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#6B7280;padding:10px 12px;text-align:left;border-bottom:2px solid #E5E7EB;background:#F9FAFB}
+td{padding:10px 12px;border-bottom:1px solid #F3F4F6;font-size:13px;color:#374151;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#F9FAFB}
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.badge-green{background:#DCFCE7;color:#166534}
+.badge-red{background:#FEE2E2;color:#991B1B}
+.badge-yellow{background:#FEF9C3;color:#854D0E}
+.badge-blue{background:#DBEAFE;color:#1E40AF}
+.badge-purple{background:#EDE9FE;color:#5B21B6}
+.badge-gray{background:#F3F4F6;color:#374151}
+.badge-gold{background:#FEF3C7;color:#92400E}
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .2s;white-space:nowrap}
+.btn-primary{background:#C8963E;color:#fff}
+.btn-primary:hover{background:#a07030}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn-outline{background:transparent;border:1.5px solid #E5E7EB;color:#374151}
+.btn-outline:hover{background:#F9FAFB}
+.btn-danger{background:#DC2626;color:#fff}
+.btn-danger:hover{background:#B91C1C}
+.btn-green{background:#059669;color:#fff}
+.btn-green:hover{background:#047857}
+/* ── TABS ── */
+.tabs{display:flex;gap:4px;background:#F3F4F6;border-radius:10px;padding:4px;margin-bottom:20px;width:fit-content}
+.tab{padding:8px 18px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;color:#6B7280;transition:all .2s}
+.tab.active{background:#fff;color:#111827;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+/* ── PROPERTY MINI-CARDS ── */
+.property-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.prop-card{background:#fff;border-radius:10px;border:1px solid #E5E7EB;padding:14px;transition:box-shadow .2s}
+.prop-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.prop-name{font-size:13px;font-weight:700;color:#111827;margin-bottom:2px}
+.prop-city{font-size:11px;color:#6B7280;margin-bottom:8px}
+.prop-occ{font-size:22px;font-weight:800;color:#111827}
+.prop-bar{height:4px;background:#E5E7EB;border-radius:2px;margin-top:6px;overflow:hidden}
+.prop-bar-fill{height:100%;border-radius:2px;background:#C8963E}
+.prop-bar-fill.high{background:#059669}
+.prop-bar-fill.low{background:#DC2626}
+/* ── ROOM GRID ── */
+.room-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:8px}
+.room-cell{border-radius:8px;padding:10px 6px;text-align:center;cursor:pointer;transition:transform .1s;border:1.5px solid transparent}
+.room-cell:hover{transform:scale(1.05)}
+.room-cell.ocupada{background:#FEE2E2;border-color:#FCA5A5;color:#991B1B}
+.room-cell.disponible{background:#DCFCE7;border-color:#86EFAC;color:#166534}
+.room-cell.limpieza{background:#FEF9C3;border-color:#FDE047;color:#854D0E}
+.room-cell.mantenimiento{background:#F3F4F6;border-color:#D1D5DB;color:#6B7280}
+.room-cell.bloqueada{background:#EDE9FE;border-color:#C4B5FD;color:#5B21B6}
+.room-num{font-size:13px;font-weight:700}
+.room-type{font-size:9px;font-weight:600;text-transform:uppercase;margin-top:1px}
+/* ── OTA CARDS ── */
+.ota-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.ota-card{background:#fff;border-radius:10px;border:1px solid #E5E7EB;padding:16px}
+.ota-name{font-size:13px;font-weight:700;margin-bottom:4px}
+.ota-rate{font-size:22px;font-weight:800;color:#111827}
+.ota-meta{font-size:11px;color:#6B7280;margin-top:2px}
+.ota-status{margin-top:8px}
+/* ── DONUT CHART ── */
+.donut-wrap{display:flex;align-items:center;gap:24px}
+.donut-legend{display:flex;flex-direction:column;gap:8px}
+.donut-leg-item{display:flex;align-items:center;gap:8px;font-size:12px}
+.donut-leg-color{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+/* ── ALERT CARDS ── */
+.alert-card{border-radius:10px;padding:16px;border-left:4px solid #D97706;background:#FFFBEB;margin-bottom:12px;display:flex;gap:14px;align-items:flex-start}
+.alert-card.red{border-left-color:#DC2626;background:#FFF5F5}
+.alert-card.green{border-left-color:#059669;background:#F0FDF4}
+.alert-icon{font-size:20px;flex-shrink:0;line-height:1}
+.alert-title{font-size:13px;font-weight:700;color:#111827}
+.alert-desc{font-size:12px;color:#6B7280;margin-top:3px}
+/* ── CRM ── */
+.crm-layout{display:grid;grid-template-columns:320px 1fr;gap:20px}
+.guest-profile{background:#fff;border-radius:12px;border:1px solid #E5E7EB;padding:20px}
+.guest-avatar-big{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#C8963E,#a07030);display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;font-weight:800;margin:0 auto 12px}
+.guest-name-big{text-align:center;font-size:16px;font-weight:700;color:#111827}
+.guest-tier{text-align:center;margin-top:4px}
+.guest-divider{border:none;border-top:1px solid #E5E7EB;margin:16px 0}
+.guest-info-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:12px}
+.guest-info-label{color:#6B7280;font-weight:500}
+.guest-info-value{color:#111827;font-weight:600;text-align:right}
+/* ── LOYALTY TIER CARDS ── */
+.tier-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.tier-card{border-radius:10px;padding:16px;color:#fff;position:relative;overflow:hidden}
+.tier-card.silver{background:linear-gradient(135deg,#6B7280,#9CA3AF)}
+.tier-card.gold{background:linear-gradient(135deg,#C8963E,#F59E0B)}
+.tier-card.platinum{background:linear-gradient(135deg,#1F2937,#374151)}
+.tier-card-name{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:.85}
+.tier-card-count{font-size:28px;font-weight:800;margin:4px 0}
+.tier-card-desc{font-size:11px;opacity:.75}
+/* ── CONFIG TOGGLES ── */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #F3F4F6}
+.toggle-row:last-child{border-bottom:none}
+.toggle-info .toggle-title{font-size:13px;font-weight:600;color:#111827}
+.toggle-info .toggle-desc{font-size:12px;color:#6B7280;margin-top:2px}
+.toggle{position:relative;display:inline-block;width:44px;height:24px}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:#D1D5DB;border-radius:24px;cursor:pointer;transition:.3s}
+.toggle-slider::before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
+input:checked + .toggle-slider{background:#C8963E}
+input:checked + .toggle-slider::before{transform:translateX(20px)}
+/* ── SEARCH BAR ── */
+.search-bar{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #E5E7EB;border-radius:10px;padding:10px 16px;margin-bottom:20px}
+.search-bar input{border:none;outline:none;flex:1;font-size:14px;font-family:'Inter',sans-serif;color:#111827}
+.search-bar svg{width:18px;height:18px;stroke:#9CA3AF;flex-shrink:0}
+/* ── SELECT/INPUT ── */
+select,input[type=text],input[type=email],input[type=number],textarea{font-family:'Inter',sans-serif;font-size:13px;border:1px solid #E5E7EB;border-radius:8px;padding:8px 12px;outline:none;width:100%;transition:border-color .2s;color:#111827}
+select:focus,input:focus,textarea:focus{border-color:#C8963E}
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:5px}
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-card{background:#fff;border-radius:12px;border-top:4px solid #C8963E;padding:28px;width:480px;max-width:90vw;max-height:90vh;overflow-y:auto;box-shadow:0 25px 60px rgba(0,0,0,.25)}
+.modal-title{font-size:17px;font-weight:700;color:#111827;margin-bottom:4px}
+.modal-sub{font-size:13px;color:#6B7280;margin-bottom:20px}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid #E5E7EB}
+/* ── TOAST ── */
+.toast{position:fixed;bottom:48px;right:24px;background:#059669;color:#fff;padding:14px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:99999;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.2);max-width:320px}
+.toast.show{opacity:1;transform:translateY(0)}
+/* ── REVENUE ENGINE ── */
+.pricing-rule-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #F3F4F6}
+.pricing-rule-row:last-child{border-bottom:none}
+/* ── BI ── */
+.bi-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.channel-bar-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #F3F4F6}
+.channel-bar-row:last-child{border-bottom:none}
+.channel-bar-name{width:100px;font-size:12px;font-weight:600;color:#374151;flex-shrink:0}
+.channel-bar-outer{flex:1;height:10px;background:#E5E7EB;border-radius:5px;overflow:hidden}
+.channel-bar-fill{height:100%;border-radius:5px;background:#C8963E}
+.channel-bar-pct{width:36px;font-size:11px;font-weight:700;color:#6B7280;text-align:right;flex-shrink:0}
+/* ── SYSTEM BANNER ── */
+.system-banner{background:linear-gradient(135deg,#111827,#1F2937);border-radius:12px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.system-banner-info{color:#fff}
+.system-banner-title{font-size:16px;font-weight:700}
+.system-banner-sub{font-size:12px;color:#9CA3AF;margin-top:3px}
+.system-badge{display:inline-flex;align-items:center;gap:6px;background:#059669;color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700}
+/* ── USER TABLE ── */
+.user-avatar-sm{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#C8963E,#a07030);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700}
+/* ── INTEGRATION CARDS ── */
+.integration-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.integ-card{background:#fff;border-radius:10px;border:1px solid #E5E7EB;padding:16px;display:flex;align-items:center;justify-content:space-between}
+.integ-info .integ-name{font-size:13px;font-weight:700;color:#111827}
+.integ-info .integ-type{font-size:11px;color:#6B7280;margin-top:2px}
+/* ── MISC ── */
+.flex{display:flex}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-8{gap:8px}.gap-12{gap:12px}.mb-16{margin-bottom:16px}.mb-20{margin-bottom:20px}.mb-24{margin-bottom:24px}.text-sm{font-size:12px}.text-xs{font-size:11px}.text-muted{color:#6B7280}.font-bold{font-weight:700}.font-semibold{font-weight:600}
+.realtime-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #F3F4F6}
+.realtime-item:last-child{border-bottom:none}
+.realtime-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.realtime-dot.in{background:#059669}
+.realtime-dot.out{background:#DC2626}
+.realtime-dot.res{background:#2563EB}
+.realtime-dot.pay{background:#C8963E}
+.section-divider{margin:20px 0;border:none;border-top:1px solid #E5E7EB}
+.hotel-selector-bar{background:#fff;border-radius:10px;border:1px solid #E5E7EB;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.hotel-selector-bar label{font-size:12px;font-weight:600;color:#374151}
+.hotel-selector-bar select{width:auto;flex:0}
+</style>
+</head>
+<body>
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-logo">
+    <img src="https://d1ofesossdj49a.cloudfront.net/c_2144/TT/favicon_83639.png" alt="DOT">
+    <span>DOT <em>FIRST</em></span>
+  </div>
+  <div class="topbar-breadcrumb">
+    <span id="breadcrumb-text">Hotel Management &rsaquo; <strong>Dashboard</strong></span>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-badge">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/></svg>
+      <span class="notif-dot"></span>
+    </div>
+    <div class="topbar-user">
+      <div>María González</div>
+      <div>Revenue Manager</div>
+    </div>
+    <div class="topbar-avatar">MG</div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-nav">
+    <div class="nav-section">Principal</div>
+    <div class="nav-item active" id="nav-dashboard" onclick="showScreen('screen-dashboard','Dashboard',this)">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" id="nav-pms" onclick="showScreen('screen-pms','PMS — Gestión de Propiedades',this)">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21"/></svg>
+      PMS
+    </div>
+    <div class="nav-section">Distribución</div>
+    <div class="nav-item" id="nav-channel" onclick="showScreen('screen-channel','Channel Manager',this)">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/></svg>
+      Channel Manager
+    </div>
+    <div class="nav-item" id="nav-revenue" onclick="showScreen('screen-revenue','Revenue Engine',this)">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"/></svg>
+      Revenue Engine
+    </div>
+    <div class="nav-section">Clientes</div>
+    <div class="nav-item" id="nav-crm" onclick="showScreen('screen-crm','CRM — Gestión de Clientes',this)">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg>
+      CRM
+    </div>
+    <div class="nav-section">Análisis</div>
+    <div class="nav-item" id="nav-bi" onclick="showScreen('screen-bi','BI — Reportes y Analítica',this)">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
+      BI Reportes
+    </div>
+    <div class="nav-section">Sistema</div>
+    <div class="nav-item" id="nav-config" onclick="showScreen('screen-config','Configuración del Sistema',this)">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+      Configuración
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SCREEN 1: DASHBOARD                                     -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="screen-dashboard" class="screen active">
+  <div class="page-header">
+    <div class="page-title">Dashboard General</div>
+    <div class="page-sub">Resumen ejecutivo de la cadena · Actualizado hace 2 min</div>
+  </div>
+
+  <!-- KPI ROW -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Ocupación Media</div>
+      <div class="kpi-value">78.4%</div>
+      <div class="kpi-change up">▲ +3.2% vs semana pasada</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">RevPAR Hoy</div>
+      <div class="kpi-value">$112</div>
+      <div class="kpi-change up">▲ +8.1% vs ayer</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">ADR Promedio</div>
+      <div class="kpi-value">$143</div>
+      <div class="kpi-change up">▲ +5.4% vs mes ant.</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">Cancelaciones</div>
+      <div class="kpi-value">23</div>
+      <div class="kpi-change down">▼ −4 vs ayer</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">Check-ins Hoy</div>
+      <div class="kpi-value">187</div>
+      <div class="kpi-change up">▲ +12 vs promedio</div>
+    </div>
+    <div class="kpi-card teal">
+      <div class="kpi-label">Ingresos Hoy</div>
+      <div class="kpi-value">$84K</div>
+      <div class="kpi-change up">▲ +6.9% vs ayer</div>
+    </div>
+  </div>
+
+  <!-- OCCUPANCY CHART + REALTIME -->
+  <div class="two-col">
+    <div class="chart-card" style="margin-bottom:0">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Ocupación — Últimos 30 días</div>
+          <div class="chart-subtitle">Promedio de 54 propiedades activas</div>
+        </div>
+        <div class="chart-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#C8963E"></div>Ocupación %</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#DC2626;border-radius:0"></div>Objetivo 75%</div>
+        </div>
+      </div>
+      <svg id="dashboard-chart" viewBox="0 0 700 200" style="width:100%;display:block"></svg>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <div class="card-title">
+        Actividad en Tiempo Real
+        <span class="badge badge-green">● En Vivo</span>
+      </div>
+      <div class="realtime-item">
+        <div class="realtime-dot in"></div>
+        <div style="flex:1"><span style="font-weight:600">Check-in confirmado</span> — Habitación 412, Hotel Madrid Boutique<br><span class="text-xs text-muted">hace 1 min · Lucas Fernández</span></div>
+      </div>
+      <div class="realtime-item">
+        <div class="realtime-dot res"></div>
+        <div style="flex:1"><span style="font-weight:600">Nueva reserva</span> — Suite 201, DOT Barcelona<br><span class="text-xs text-muted">hace 3 min · OTA: Booking.com · $220/noche</span></div>
+      </div>
+      <div class="realtime-item">
+        <div class="realtime-dot pay"></div>
+        <div style="flex:1"><span style="font-weight:600">Pago procesado</span> — $1,240 · DOT Buenos Aires<br><span class="text-xs text-muted">hace 5 min · Checkout hab. 308</span></div>
+      </div>
+      <div class="realtime-item">
+        <div class="realtime-dot out"></div>
+        <div style="flex:1"><span style="font-weight:600">Check-out</span> — Habitación 115, DOT Medellín<br><span class="text-xs text-muted">hace 7 min · Andrés Moreno</span></div>
+      </div>
+      <div class="realtime-item">
+        <div class="realtime-dot res"></div>
+        <div style="flex:1"><span style="font-weight:600">Modificación de reserva</span> — DOT Miami<br><span class="text-xs text-muted">hace 9 min · Fechas cambiadas +2 noches</span></div>
+      </div>
+      <div class="realtime-item">
+        <div class="realtime-dot in"></div>
+        <div style="flex:1"><span style="font-weight:600">Check-in confirmado</span> — Hab. 503, DOT Roma<br><span class="text-xs text-muted">hace 11 min · Sofia Ricci</span></div>
+      </div>
+      <div class="realtime-item">
+        <div class="realtime-dot pay"></div>
+        <div style="flex:1"><span style="font-weight:600">Pago procesado</span> — $680 · DOT Ciudad de México<br><span class="text-xs text-muted">hace 14 min · Reserva directa</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:24px">
+    <div class="card-title" style="margin-bottom:14px">Propiedades — Estado en Tiempo Real <span class="badge badge-blue" style="font-size:10px">54 activas</span></div>
+    <div class="property-grid">
+      <div class="prop-card"><div class="prop-name">DOT Madrid Boutique</div><div class="prop-city">Madrid, España</div><div class="prop-occ">91%</div><div class="prop-bar"><div class="prop-bar-fill high" style="width:91%"></div></div></div>
+      <div class="prop-card"><div class="prop-name">DOT Barcelona Centro</div><div class="prop-city">Barcelona, España</div><div class="prop-occ">85%</div><div class="prop-bar"><div class="prop-bar-fill high" style="width:85%"></div></div></div>
+      <div class="prop-card"><div class="prop-name">DOT Buenos Aires</div><div class="prop-city">Buenos Aires, Argentina</div><div class="prop-occ">78%</div><div class="prop-bar"><div class="prop-bar-fill" style="width:78%"></div></div></div>
+      <div class="prop-card"><div class="prop-name">DOT Medellín</div><div class="prop-city">Medellín, Colombia</div><div class="prop-occ">72%</div><div class="prop-bar"><div class="prop-bar-fill" style="width:72%"></div></div></div>
+      <div class="prop-card"><div class="prop-name">DOT Miami Beach</div><div class="prop-city">Miami, USA</div><div class="prop-occ">88%</div><div class="prop-bar"><div class="prop-bar-fill high" style="width:88%"></div></div></div>
+      <div class="prop-card"><div class="prop-name">DOT Roma Trastevere</div><div class="prop-city">Roma, Italia</div><div class="prop-occ">94%</div><div class="prop-bar"><div class="prop-bar-fill high" style="width:94%"></div></div></div>
+      <div class="prop-card"><div class="prop-name">DOT Ciudad de México</div><div class="prop-city">CDMX, México</div><div class="prop-occ">65%</div><div class="prop-bar"><div class="prop-bar-fill low" style="width:65%"></div></div></div>
+      <div class="prop-card"><div class="prop-name">DOT Bogotá Zona Rosa</div><div class="prop-city">Bogotá, Colombia</div><div class="prop-occ">70%</div><div class="prop-bar"><div class="prop-bar-fill low" style="width:70%"></div></div></div>
+      <div class="prop-card"><div class="prop-name">DOT Florencia</div><div class="prop-city">Florencia, Italia</div><div class="prop-occ">82%</div><div class="prop-bar"><div class="prop-bar-fill" style="width:82%"></div></div></div>
+      <div class="prop-card"><div class="prop-name">DOT Lima Miraflores</div><div class="prop-city">Lima, Perú</div><div class="prop-occ">76%</div><div class="prop-bar"><div class="prop-bar-fill" style="width:76%"></div></div></div>
+      <div class="prop-card"><div class="prop-name">DOT Santiago Centro</div><div class="prop-city">Santiago, Chile</div><div class="prop-occ">80%</div><div class="prop-bar"><div class="prop-bar-fill" style="width:80%"></div></div></div>
+      <div class="prop-card"><div class="prop-name">DOT New York SoHo</div><div class="prop-city">Nueva York, USA</div><div class="prop-occ">96%</div><div class="prop-bar"><div class="prop-bar-fill high" style="width:96%"></div></div></div>
+    </div>
+  </div>
+</div>
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SCREEN 2: PMS                                           -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="screen-pms" class="screen">
+  <div class="page-header">
+    <div class="page-title">PMS — Gestión de Propiedades</div>
+    <div class="page-sub">Selecciona una propiedad para gestionar habitaciones, llegadas y reservas</div>
+  </div>
+
+  <div class="hotel-selector-bar">
+    <label>Propiedad:</label>
+    <select style="width:260px">
+      <option>DOT Madrid Boutique — Madrid, España</option>
+      <option>DOT Barcelona Centro — Barcelona, España</option>
+      <option>DOT Buenos Aires — Argentina</option>
+      <option>DOT Medellín — Colombia</option>
+      <option>DOT Miami Beach — USA</option>
+      <option>DOT Roma Trastevere — Italia</option>
+      <option>DOT Ciudad de México — México</option>
+    </select>
+    <label>Fecha:</label>
+    <input type="text" value="14 Jun 2025" style="width:140px">
+    <div class="badge badge-green" style="margin-left:auto">● 48 hab. disponibles</div>
+    <div class="badge badge-red">12 ocupadas</div>
+    <div class="badge badge-yellow">4 en limpieza</div>
+    <div class="badge badge-gray">2 mantenimiento</div>
+  </div>
+
+  <div class="tabs" id="pms-tabs">
+    <div class="tab active" onclick="showPmsTab('pms-habitaciones',this)">Habitaciones</div>
+    <div class="tab" onclick="showPmsTab('pms-llegadas',this)">Llegadas</div>
+    <div class="tab" onclick="showPmsTab('pms-salidas',this)">Salidas</div>
+    <div class="tab" onclick="showPmsTab('pms-reservas',this)">Reservas</div>
+  </div>
+
+  <!-- SUB-TAB: HABITACIONES -->
+  <div id="pms-habitaciones" class="pms-tab">
+    <div class="card">
+      <div class="card-title">Mapa de Habitaciones — Planta 1–4 <span class="badge badge-gray" style="font-size:11px">66 habitaciones</span></div>
+      <div style="margin-bottom:10px;display:flex;gap:14px;flex-wrap:wrap">
+        <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px"><span style="width:12px;height:12px;background:#FEE2E2;border-radius:3px;display:inline-block"></span>Ocupada</span>
+        <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px"><span style="width:12px;height:12px;background:#DCFCE7;border-radius:3px;display:inline-block"></span>Disponible</span>
+        <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px"><span style="width:12px;height:12px;background:#FEF9C3;border-radius:3px;display:inline-block"></span>Limpieza</span>
+        <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px"><span style="width:12px;height:12px;background:#F3F4F6;border-radius:3px;display:inline-block"></span>Mantenimiento</span>
+        <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px"><span style="width:12px;height:12px;background:#EDE9FE;border-radius:3px;display:inline-block"></span>Bloqueada</span>
+      </div>
+      <div class="room-grid">
+        <div class="room-cell ocupada"><div class="room-num">101</div><div class="room-type">STD</div></div>
+        <div class="room-cell disponible"><div class="room-num">102</div><div class="room-type">STD</div></div>
+        <div class="room-cell disponible"><div class="room-num">103</div><div class="room-type">DLX</div></div>
+        <div class="room-cell limpieza"><div class="room-num">104</div><div class="room-type">DLX</div></div>
+        <div class="room-cell disponible"><div class="room-num">105</div><div class="room-type">STD</div></div>
+        <div class="room-cell ocupada"><div class="room-num">106</div><div class="room-type">DLX</div></div>
+        <div class="room-cell mantenimiento"><div class="room-num">107</div><div class="room-type">STD</div></div>
+        <div class="room-cell disponible"><div class="room-num">108</div><div class="room-type">STD</div></div>
+        <div class="room-cell disponible"><div class="room-num">201</div><div class="room-type">DLX</div></div>
+        <div class="room-cell ocupada"><div class="room-num">202</div><div class="room-type">SUP</div></div>
+        <div class="room-cell disponible"><div class="room-num">203</div><div class="room-type">STD</div></div>
+        <div class="room-cell limpieza"><div class="room-num">204</div><div class="room-type">DLX</div></div>
+        <div class="room-cell disponible"><div class="room-num">205</div><div class="room-type">STD</div></div>
+        <div class="room-cell disponible"><div class="room-num">206</div><div class="room-type">DLX</div></div>
+        <div class="room-cell ocupada"><div class="room-num">207</div><div class="room-type">SUP</div></div>
+        <div class="room-cell bloqueada"><div class="room-num">208</div><div class="room-type">DLX</div></div>
+        <div class="room-cell ocupada"><div class="room-num">301</div><div class="room-type">SUP</div></div>
+        <div class="room-cell disponible"><div class="room-num">302</div><div class="room-type">DLX</div></div>
+        <div class="room-cell disponible"><div class="room-num">303</div><div class="room-type">STD</div></div>
+        <div class="room-cell limpieza"><div class="room-num">304</div><div class="room-type">STD</div></div>
+        <div class="room-cell disponible"><div class="room-num">305</div><div class="room-type">DLX</div></div>
+        <div class="room-cell ocupada"><div class="room-num">306</div><div class="room-type">DLX</div></div>
+        <div class="room-cell mantenimiento"><div class="room-num">307</div><div class="room-type">SUP</div></div>
+        <div class="room-cell disponible"><div class="room-num">308</div><div class="room-type">DLX</div></div>
+        <div class="room-cell disponible"><div class="room-num">401</div><div class="room-type">STE</div></div>
+        <div class="room-cell ocupada"><div class="room-num">402</div><div class="room-type">STE</div></div>
+        <div class="room-cell disponible"><div class="room-num">403</div><div class="room-type">DLX</div></div>
+        <div class="room-cell ocupada"><div class="room-num">404</div><div class="room-type">STE</div></div>
+        <div class="room-cell disponible"><div class="room-num">405</div><div class="room-type">DLX</div></div>
+        <div class="room-cell limpieza"><div class="room-num">406</div><div class="room-type">STE</div></div>
+        <div class="room-cell disponible"><div class="room-num">407</div><div class="room-type">DLX</div></div>
+        <div class="room-cell bloqueada"><div class="room-num">408</div><div class="room-type">STE</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUB-TAB: LLEGADAS -->
+  <div id="pms-llegadas" class="pms-tab" style="display:none">
+    <div class="card">
+      <div class="card-title">Llegadas del día — 14 Jun 2025 <span class="badge badge-blue">18 llegadas</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Reserva</th><th>Huésped</th><th>Habitación</th><th>Tipo</th><th>Check-in</th><th>Noches</th><th>Canal</th><th>Estado</th><th>Acción</th></tr></thead>
+          <tbody>
+            <tr><td><strong>#RES-40821</strong></td><td>Lucas Fernández</td><td>412</td><td><span class="badge badge-purple">Suite</span></td><td>14 Jun</td><td>3</td><td>Booking.com</td><td><span class="badge badge-yellow">Pendiente</span></td><td><button class="btn btn-green btn-sm" onclick="openModal()">Check-in</button></td></tr>
+            <tr><td><strong>#RES-40822</strong></td><td>Ana García</td><td>205</td><td><span class="badge badge-blue">Deluxe</span></td><td>14 Jun</td><td>2</td><td>Directo</td><td><span class="badge badge-yellow">Pendiente</span></td><td><button class="btn btn-green btn-sm" onclick="openModal()">Check-in</button></td></tr>
+            <tr><td><strong>#RES-40823</strong></td><td>Marco Rossi</td><td>108</td><td><span class="badge badge-gray">Estándar</span></td><td>14 Jun</td><td>5</td><td>Expedia</td><td><span class="badge badge-green">Confirmado</span></td><td><button class="btn btn-green btn-sm" onclick="openModal()">Check-in</button></td></tr>
+            <tr><td><strong>#RES-40824</strong></td><td>Sofia Martínez</td><td>301</td><td><span class="badge badge-gold">Superior</span></td><td>14 Jun</td><td>4</td><td>Airbnb</td><td><span class="badge badge-yellow">Pendiente</span></td><td><button class="btn btn-green btn-sm" onclick="openModal()">Check-in</button></td></tr>
+            <tr><td><strong>#RES-40825</strong></td><td>David Lee</td><td>402</td><td><span class="badge badge-purple">Suite</span></td><td>14 Jun</td><td>7</td><td>Booking.com</td><td><span class="badge badge-green">Confirmado</span></td><td><button class="btn btn-green btn-sm" onclick="openModal()">Check-in</button></td></tr>
+            <tr><td><strong>#RES-40826</strong></td><td>Emma Wilson</td><td>203</td><td><span class="badge badge-gray">Estándar</span></td><td>14 Jun</td><td>2</td><td>Directo</td><td><span class="badge badge-yellow">Pendiente</span></td><td><button class="btn btn-green btn-sm" onclick="openModal()">Check-in</button></td></tr>
+            <tr><td><strong>#RES-40827</strong></td><td>Carlos Ramírez</td><td>306</td><td><span class="badge badge-blue">Deluxe</span></td><td>14 Jun</td><td>3</td><td>Expedia</td><td><span class="badge badge-green">Confirmado</span></td><td><button class="btn btn-green btn-sm" onclick="openModal()">Check-in</button></td></tr>
+            <tr><td><strong>#RES-40828</strong></td><td>Isabelle Dupont</td><td>104</td><td><span class="badge badge-blue">Deluxe</span></td><td>14 Jun</td><td>6</td><td>Booking.com</td><td><span class="badge badge-yellow">Pendiente</span></td><td><button class="btn btn-green btn-sm" onclick="openModal()">Check-in</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUB-TAB: SALIDAS -->
+  <div id="pms-salidas" class="pms-tab" style="display:none">
+    <div class="card">
+      <div class="card-title">Salidas del día — 14 Jun 2025 <span class="badge badge-red">14 salidas</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Reserva</th><th>Huésped</th><th>Habitación</th><th>Check-in</th><th>Check-out</th><th>Noches</th><th>Total</th><th>Estado</th><th>Acción</th></tr></thead>
+          <tbody>
+            <tr><td><strong>#RES-40710</strong></td><td>Roberto Silva</td><td>101</td><td>10 Jun</td><td>14 Jun</td><td>4</td><td><strong>$480</strong></td><td><span class="badge badge-yellow">Por salir</span></td><td><button class="btn btn-outline btn-sm">Check-out</button></td></tr>
+            <tr><td><strong>#RES-40712</strong></td><td>Marta López</td><td>202</td><td>11 Jun</td><td>14 Jun</td><td>3</td><td><strong>$540</strong></td><td><span class="badge badge-yellow">Por salir</span></td><td><button class="btn btn-outline btn-sm">Check-out</button></td></tr>
+            <tr><td><strong>#RES-40715</strong></td><td>James Brown</td><td>307</td><td>9 Jun</td><td>14 Jun</td><td>5</td><td><strong>$900</strong></td><td><span class="badge badge-green">Listo</span></td><td><button class="btn btn-outline btn-sm">Check-out</button></td></tr>
+            <tr><td><strong>#RES-40718</strong></td><td>Carla Vega</td><td>404</td><td>12 Jun</td><td>14 Jun</td><td>2</td><td><strong>$760</strong></td><td><span class="badge badge-yellow">Por salir</span></td><td><button class="btn btn-outline btn-sm">Check-out</button></td></tr>
+            <tr><td><strong>#RES-40720</strong></td><td>Thomas Weber</td><td>106</td><td>10 Jun</td><td>14 Jun</td><td>4</td><td><strong>$620</strong></td><td><span class="badge badge-green">Listo</span></td><td><button class="btn btn-outline btn-sm">Check-out</button></td></tr>
+            <tr><td><strong>#RES-40722</strong></td><td>Patricia Herrera</td><td>207</td><td>13 Jun</td><td>14 Jun</td><td>1</td><td><strong>$210</strong></td><td><span class="badge badge-yellow">Por salir</span></td><td><button class="btn btn-outline btn-sm">Check-out</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUB-TAB: RESERVAS -->
+  <div id="pms-reservas" class="pms-tab" style="display:none">
+    <div class="card">
+      <div class="card-title">Reservas Activas — Próximos 14 días <span class="badge badge-blue">47 reservas</span></div>
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <button class="btn btn-primary btn-sm">+ Nueva Reserva</button>
+        <button class="btn btn-outline btn-sm">Exportar</button>
+        <input type="text" placeholder="Buscar por huésped o número..." style="width:240px">
+        <select style="width:150px"><option>Todos los tipos</option><option>Estándar</option><option>Deluxe</option><option>Superior</option><option>Suite</option></select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Reserva</th><th>Huésped</th><th>Entrada</th><th>Salida</th><th>Tipo</th><th>ADR</th><th>Total</th><th>Canal</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td><strong>#RES-40821</strong></td><td>Lucas Fernández</td><td>14 Jun</td><td>17 Jun</td><td><span class="badge badge-purple">Suite</span></td><td>$320</td><td>$960</td><td>Booking.com</td><td><span class="badge badge-yellow">Pendiente CI</span></td></tr>
+            <tr><td><strong>#RES-40830</strong></td><td>Nina Petrov</td><td>15 Jun</td><td>18 Jun</td><td><span class="badge badge-blue">Deluxe</span></td><td>$165</td><td>$495</td><td>Expedia</td><td><span class="badge badge-green">Confirmado</span></td></tr>
+            <tr><td><strong>#RES-40831</strong></td><td>José Alvarado</td><td>15 Jun</td><td>22 Jun</td><td><span class="badge badge-gray">Estándar</span></td><td>$120</td><td>$840</td><td>Directo</td><td><span class="badge badge-green">Confirmado</span></td></tr>
+            <tr><td><strong>#RES-40832</strong></td><td>Claire Bernard</td><td>16 Jun</td><td>19 Jun</td><td><span class="badge badge-gold">Superior</span></td><td>$195</td><td>$585</td><td>Booking.com</td><td><span class="badge badge-green">Confirmado</span></td></tr>
+            <tr><td><strong>#RES-40833</strong></td><td>Oscar Jiménez</td><td>16 Jun</td><td>17 Jun</td><td><span class="badge badge-gray">Estándar</span></td><td>$130</td><td>$130</td><td>Airbnb</td><td><span class="badge badge-red">Pre-pago</span></td></tr>
+            <tr><td><strong>#RES-40834</strong></td><td>Yuki Tanaka</td><td>17 Jun</td><td>21 Jun</td><td><span class="badge badge-purple">Suite</span></td><td>$380</td><td>$1,520</td><td>Directo</td><td><span class="badge badge-green">Confirmado</span></td></tr>
+            <tr><td><strong>#RES-40835</strong></td><td>Hans Mueller</td><td>18 Jun</td><td>20 Jun</td><td><span class="badge badge-blue">Deluxe</span></td><td>$155</td><td>$310</td><td>Expedia</td><td><span class="badge badge-yellow">En espera</span></td></tr>
+            <tr><td><strong>#RES-40836</strong></td><td>Laura Santana</td><td>18 Jun</td><td>25 Jun</td><td><span class="badge badge-gold">Superior</span></td><td>$175</td><td>$1,225</td><td>Booking.com</td><td><span class="badge badge-green">Confirmado</span></td></tr>
+            <tr><td><strong>#RES-40837</strong></td><td>Ahmed Hassan</td><td>19 Jun</td><td>22 Jun</td><td><span class="badge badge-gray">Estándar</span></td><td>$110</td><td>$330</td><td>Directo</td><td><span class="badge badge-green">Confirmado</span></td></tr>
+            <tr><td><strong>#RES-40838</strong></td><td>Maria Costa</td><td>20 Jun</td><td>24 Jun</td><td><span class="badge badge-blue">Deluxe</span></td><td>$160</td><td>$640</td><td>Booking.com</td><td><span class="badge badge-green">Confirmado</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SCREEN 3: CHANNEL MANAGER                               -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="screen-channel" class="screen">
+  <div class="page-header">
+    <div class="page-title">Channel Manager</div>
+    <div class="page-sub">Gestión de tarifas y disponibilidad en todos los canales de distribución</div>
+  </div>
+
+  <div class="ota-grid">
+    <div class="ota-card">
+      <div class="ota-name" style="color:#003580">● Booking.com</div>
+      <div class="ota-rate">$142</div>
+      <div class="ota-meta">ADR · Paridad: <span style="color:#059669;font-weight:600">OK</span></div>
+      <div class="ota-status"><span class="badge badge-green">Conectado</span></div>
+    </div>
+    <div class="ota-card">
+      <div class="ota-name" style="color:#FF5A00">● Expedia</div>
+      <div class="ota-rate">$139</div>
+      <div class="ota-meta">ADR · Paridad: <span style="color:#DC2626;font-weight:600">−$3 ↓</span></div>
+      <div class="ota-status"><span class="badge badge-green">Conectado</span></div>
+    </div>
+    <div class="ota-card">
+      <div class="ota-name" style="color:#FF385C">● Airbnb</div>
+      <div class="ota-rate">$148</div>
+      <div class="ota-meta">ADR · Paridad: <span style="color:#D97706;font-weight:600">+$6 ↑</span></div>
+      <div class="ota-status"><span class="badge badge-green">Conectado</span></div>
+    </div>
+    <div class="ota-card">
+      <div class="ota-name" style="color:#C8963E">● Canal Directo</div>
+      <div class="ota-rate">$155</div>
+      <div class="ota-meta">ADR · Mejor precio</div>
+      <div class="ota-status"><span class="badge badge-gold">Propio</span></div>
+    </div>
+    <div class="ota-card">
+      <div class="ota-name" style="color:#374151">● Hotels.com</div>
+      <div class="ota-rate">$140</div>
+      <div class="ota-meta">ADR · Paridad: <span style="color:#059669;font-weight:600">OK</span></div>
+      <div class="ota-status"><span class="badge badge-green">Conectado</span></div>
+    </div>
+    <div class="ota-card">
+      <div class="ota-name" style="color:#374151">● Tripadvisor</div>
+      <div class="ota-rate">$144</div>
+      <div class="ota-meta">ADR · Paridad: <span style="color:#059669;font-weight:600">OK</span></div>
+      <div class="ota-status"><span class="badge badge-green">Conectado</span></div>
+    </div>
+    <div class="ota-card">
+      <div class="ota-name" style="color:#374151">● Despegar</div>
+      <div class="ota-rate">$138</div>
+      <div class="ota-meta">ADR · Paridad: <span style="color:#DC2626;font-weight:600">−$4 ↓</span></div>
+      <div class="ota-status"><span class="badge badge-yellow">Revisar</span></div>
+    </div>
+    <div class="ota-card">
+      <div class="ota-name" style="color:#374151">● Hotelbeds</div>
+      <div class="ota-rate">$136</div>
+      <div class="ota-meta">ADR · Mayorista</div>
+      <div class="ota-status"><span class="badge badge-blue">GDS</span></div>
+    </div>
+    <div class="ota-card">
+      <div class="ota-name" style="color:#374151">● Agoda</div>
+      <div class="ota-rate">$141</div>
+      <div class="ota-meta">ADR · Asia-Pacífico</div>
+      <div class="ota-status"><span class="badge badge-green">Conectado</span></div>
+    </div>
+    <div class="ota-card">
+      <div class="ota-name" style="color:#374151">● Vrbo</div>
+      <div class="ota-rate">$152</div>
+      <div class="ota-meta">ADR · Paridad: <span style="color:#D97706;font-weight:600">+$10 ↑</span></div>
+      <div class="ota-status"><span class="badge badge-yellow">Revisar</span></div>
+    </div>
+    <div class="ota-card">
+      <div class="ota-name" style="color:#374151">● Google Hotel</div>
+      <div class="ota-rate">$143</div>
+      <div class="ota-meta">ADR · Paridad: <span style="color:#059669;font-weight:600">OK</span></div>
+      <div class="ota-status"><span class="badge badge-green">Conectado</span></div>
+    </div>
+    <div class="ota-card">
+      <div class="ota-name" style="color:#374151">● Sabre GDS</div>
+      <div class="ota-rate">$133</div>
+      <div class="ota-meta">ADR · Corporativo</div>
+      <div class="ota-status"><span class="badge badge-blue">GDS</span></div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <!-- RATE PARITY TABLE -->
+    <div class="card">
+      <div class="card-title">Paridad de Tarifas — Room Type: Deluxe Doble</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Canal</th><th>Tarifa</th><th>vs. Directo</th><th>Estado</th><th></th></tr></thead>
+          <tbody>
+            <tr><td>Canal Directo</td><td><strong>$155</strong></td><td>—</td><td><span class="badge badge-gold">Base</span></td><td><button class="btn btn-outline btn-sm">Editar</button></td></tr>
+            <tr><td>Booking.com</td><td>$142</td><td style="color:#DC2626">−$13</td><td><span class="badge badge-red">Alerta</span></td><td><button class="btn btn-outline btn-sm">Sync</button></td></tr>
+            <tr><td>Expedia</td><td>$139</td><td style="color:#DC2626">−$16</td><td><span class="badge badge-red">Alerta</span></td><td><button class="btn btn-outline btn-sm">Sync</button></td></tr>
+            <tr><td>Airbnb</td><td>$148</td><td style="color:#D97706">−$7</td><td><span class="badge badge-yellow">Revisar</span></td><td><button class="btn btn-outline btn-sm">Sync</button></td></tr>
+            <tr><td>Hotels.com</td><td>$140</td><td style="color:#DC2626">−$15</td><td><span class="badge badge-red">Alerta</span></td><td><button class="btn btn-outline btn-sm">Sync</button></td></tr>
+            <tr><td>Despegar</td><td>$138</td><td style="color:#DC2626">−$17</td><td><span class="badge badge-red">Alerta</span></td><td><button class="btn btn-outline btn-sm">Sync</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:12px">
+        <button class="btn btn-primary btn-sm">Sincronizar Todos los Canales</button>
+      </div>
+    </div>
+
+    <!-- DONUT CHART -->
+    <div class="card">
+      <div class="card-title">Distribución de Reservas por Canal</div>
+      <div class="donut-wrap">
+        <svg id="channel-donut" viewBox="0 0 200 200" style="width:200px;min-width:180px;display:block"></svg>
+        <div class="donut-legend">
+          <div class="donut-leg-item"><div class="donut-leg-color" style="background:#003580"></div><div><strong>Booking.com</strong><br><span class="text-muted">38% · 1,482 reservas</span></div></div>
+          <div class="donut-leg-item"><div class="donut-leg-color" style="background:#C8963E"></div><div><strong>Canal Directo</strong><br><span class="text-muted">22% · 858 reservas</span></div></div>
+          <div class="donut-leg-item"><div class="donut-leg-color" style="background:#FF5A00"></div><div><strong>Expedia</strong><br><span class="text-muted">18% · 702 reservas</span></div></div>
+          <div class="donut-leg-item"><div class="donut-leg-color" style="background:#FF385C"></div><div><strong>Airbnb</strong><br><span class="text-muted">12% · 468 reservas</span></div></div>
+          <div class="donut-leg-item"><div class="donut-leg-color" style="background:#6B7280"></div><div><strong>Otros</strong><br><span class="text-muted">10% · 390 reservas</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SCREEN 4: REVENUE ENGINE                                -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="screen-revenue" class="screen">
+  <div class="page-header">
+    <div class="page-title">Revenue Engine</div>
+    <div class="page-sub">Optimización dinámica de precios basada en demanda, competencia y eventos</div>
+  </div>
+
+  <div class="three-col" style="margin-bottom:20px">
+    <div class="alert-card red">
+      <div class="alert-icon">🔴</div>
+      <div>
+        <div class="alert-title">Tarifa por debajo del mercado</div>
+        <div class="alert-desc">DOT Medellín — Hab. Estándar $95 vs. comp. $118 promedio. Ajuste sugerido: +$18</div>
+        <div style="margin-top:8px"><button class="btn btn-primary btn-sm">Aplicar Sugerencia</button></div>
+      </div>
+    </div>
+    <div class="alert-card">
+      <div class="alert-icon">🟡</div>
+      <div>
+        <div class="alert-title">Evento de alta demanda detectado</div>
+        <div class="alert-desc">Feria Madrid 20–23 Jun · Ocupación proy. 98% · Aumentar tarifas 15–25%</div>
+        <div style="margin-top:8px"><button class="btn btn-primary btn-sm">Ver Estrategia</button></div>
+      </div>
+    </div>
+    <div class="alert-card green">
+      <div class="alert-icon">🟢</div>
+      <div>
+        <div class="alert-title">Revenue máximo alcanzado</div>
+        <div class="alert-desc">DOT New York SoHo — RevPAR $189, +32% vs mes anterior. Mantener estrategia.</div>
+        <div style="margin-top:8px"><button class="btn btn-outline btn-sm">Ver Detalles</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RevPAR CHART -->
+  <div class="chart-card">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">RevPAR — Proyección vs. Histórico (31 días)</div>
+        <div class="chart-subtitle">Cadena completa · Modelo predictivo DOT AI</div>
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#2563EB"></div>Proyectado</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#9CA3AF"></div>Histórico</div>
+      </div>
+    </div>
+    <svg id="revpar-chart" viewBox="0 0 900 220" style="width:100%;display:block"></svg>
+  </div>
+
+  <!-- PRICING RULES -->
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">Reglas de Pricing Activas <span class="badge badge-green">8 activas</span></div>
+      <div class="pricing-rule-row">
+        <div><div style="font-size:13px;font-weight:600">Last Minute — 24h</div><div class="text-xs text-muted">Descuento del 15% en hab. disponibles</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span class="badge badge-green">Activa</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      </div>
+      <div class="pricing-rule-row">
+        <div><div style="font-size:13px;font-weight:600">Early Bird — 60 días</div><div class="text-xs text-muted">Descuento del 20% con pago anticipado</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span class="badge badge-green">Activa</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      </div>
+      <div class="pricing-rule-row">
+        <div><div style="font-size:13px;font-weight:600">Ocupación Alta (&gt;85%)</div><div class="text-xs text-muted">Incremento dinámico +12–18%</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span class="badge badge-green">Activa</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      </div>
+      <div class="pricing-rule-row">
+        <div><div style="font-size:13px;font-weight:600">Fin de Semana Premium</div><div class="text-xs text-muted">Sáb-Dom +10% sobre tarifa base</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span class="badge badge-green">Activa</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      </div>
+      <div class="pricing-rule-row">
+        <div><div style="font-size:13px;font-weight:600">Eventos Locales</div><div class="text-xs text-muted">Ajuste por calendario de eventos</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span class="badge badge-green">Activa</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      </div>
+      <div class="pricing-rule-row">
+        <div><div style="font-size:13px;font-weight:600">Ocupación Baja (&lt;50%)</div><div class="text-xs text-muted">Descuento automático −10%</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span class="badge badge-yellow">Pausa</span><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div>
+      </div>
+      <div class="pricing-rule-row">
+        <div><div style="font-size:13px;font-weight:600">Fidelidad Platinum</div><div class="text-xs text-muted">−5% para miembros Platinum</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span class="badge badge-green">Activa</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      </div>
+      <div class="pricing-rule-row">
+        <div><div style="font-size:13px;font-weight:600">Grupos (+10 hab.)</div><div class="text-xs text-muted">Negociación manual, bloqueo de cupo</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span class="badge badge-green">Activa</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Comparativa de Competencia — Madrid</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Hotel</th><th>Estrellas</th><th>ADR Hoy</th><th>vs. DOT</th><th>Ocup.</th></tr></thead>
+          <tbody>
+            <tr><td><strong>DOT Madrid</strong></td><td>⭐⭐⭐⭐</td><td><strong>$142</strong></td><td>—</td><td><span class="badge badge-green">91%</span></td></tr>
+            <tr><td>Hotel Ópera</td><td>⭐⭐⭐⭐</td><td>$138</td><td style="color:#059669">−$4 ✓</td><td>88%</td></tr>
+            <tr><td>Vincci Capitol</td><td>⭐⭐⭐⭐</td><td>$155</td><td style="color:#DC2626">+$13 ↑</td><td>85%</td></tr>
+            <tr><td>NH Collection</td><td>⭐⭐⭐⭐</td><td>$148</td><td style="color:#DC2626">+$6 ↑</td><td>92%</td></tr>
+            <tr><td>Room Mate Mario</td><td>⭐⭐⭐</td><td>$118</td><td style="color:#059669">−$24 ✓</td><td>79%</td></tr>
+            <tr><td>AC by Marriott</td><td>⭐⭐⭐⭐</td><td>$162</td><td style="color:#DC2626">+$20 ↑</td><td>94%</td></tr>
+            <tr><td>Ibis Styles Madrid</td><td>⭐⭐⭐</td><td>$95</td><td style="color:#059669">−$47 ✓</td><td>74%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:12px;padding:12px;background:#F0FDF4;border-radius:8px;border:1px solid #86EFAC">
+        <div style="font-size:12px;font-weight:700;color:#166534">✓ DOT Madrid está posicionado correctamente</div>
+        <div style="font-size:11px;color:#166534;margin-top:2px">Precio competitivo en el segmento 4 estrellas · ADR +2.9% sobre promedio de comp-set</div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SCREEN 5: CRM                                           -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="screen-crm" class="screen">
+  <div class="page-header">
+    <div class="page-title">CRM — Gestión de Clientes</div>
+    <div class="page-sub">Base de datos de huéspedes, historial de estadías y programa de fidelidad DOT Rewards</div>
+  </div>
+
+  <!-- LOYALTY TIER CARDS -->
+  <div class="tier-cards">
+    <div class="tier-card silver">
+      <div class="tier-card-name">Silver</div>
+      <div class="tier-card-count">8,420</div>
+      <div class="tier-card-desc">miembros activos · 1–4 estancias/año</div>
+    </div>
+    <div class="tier-card gold">
+      <div class="tier-card-name">Gold</div>
+      <div class="tier-card-count">2,185</div>
+      <div class="tier-card-desc">miembros activos · 5–9 estancias/año</div>
+    </div>
+    <div class="tier-card platinum">
+      <div class="tier-card-name">Platinum</div>
+      <div class="tier-card-count">634</div>
+      <div class="tier-card-desc">miembros activos · 10+ estancias/año</div>
+    </div>
+  </div>
+
+  <div class="search-bar">
+    <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+    <input type="text" placeholder="Buscar huésped por nombre, email, número de membresía o teléfono...">
+    <button class="btn btn-primary btn-sm">Buscar</button>
+    <button class="btn btn-outline btn-sm">+ Nuevo Huésped</button>
+  </div>
+
+  <div class="crm-layout">
+    <!-- GUEST PROFILE -->
+    <div class="guest-profile">
+      <div class="guest-avatar-big">LF</div>
+      <div class="guest-name-big">Lucas Fernández</div>
+      <div class="guest-tier"><span class="badge badge-gold">⭐ Gold Member</span></div>
+      <hr class="guest-divider">
+      <div class="guest-info-row"><span class="guest-info-label">Membresía</span><span class="guest-info-value">#DOT-48291</span></div>
+      <div class="guest-info-row"><span class="guest-info-label">Email</span><span class="guest-info-value" style="font-size:11px">l.fernandez@gmail.com</span></div>
+      <div class="guest-info-row"><span class="guest-info-label">Teléfono</span><span class="guest-info-value">+34 612 345 678</span></div>
+      <div class="guest-info-row"><span class="guest-info-label">Nacionalidad</span><span class="guest-info-value">🇪🇸 Español</span></div>
+      <div class="guest-info-row"><span class="guest-info-label">Idioma</span><span class="guest-info-value">Español / Inglés</span></div>
+      <div class="guest-info-row"><span class="guest-info-label">Fecha de alta</span><span class="guest-info-value">12 Mar 2021</span></div>
+      <hr class="guest-divider">
+      <div class="guest-info-row"><span class="guest-info-label">Total estancias</span><span class="guest-info-value" style="color:#C8963E;font-size:16px">8</span></div>
+      <div class="guest-info-row"><span class="guest-info-label">Noches totales</span><span class="guest-info-value">31</span></div>
+      <div class="guest-info-row"><span class="guest-info-label">Gasto total</span><span class="guest-info-value" style="color:#059669">$4,280</span></div>
+      <div class="guest-info-row"><span class="guest-info-label">ADR promedio</span><span class="guest-info-value">$138</span></div>
+      <div class="guest-info-row"><span class="guest-info-label">Puntos DOT</span><span class="guest-info-value" style="color:#C8963E">4,280 pts</span></div>
+      <hr class="guest-divider">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#6B7280;margin-bottom:8px">Preferencias</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <span class="badge badge-blue">Planta alta</span>
+        <span class="badge badge-blue">Sin alérgenos</span>
+        <span class="badge badge-blue">Almohada extra</span>
+        <span class="badge badge-blue">Vista ciudad</span>
+        <span class="badge badge-blue">Check-in tardío</span>
+      </div>
+      <hr class="guest-divider">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="btn btn-primary" style="width:100%;justify-content:center">Enviar Oferta Especial</button>
+        <button class="btn btn-outline" style="width:100%;justify-content:center">Editar Perfil</button>
+      </div>
+    </div>
+
+    <!-- STAY HISTORY -->
+    <div>
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-title">Historial de Estadías — Lucas Fernández</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Propiedad</th><th>Check-in</th><th>Check-out</th><th>Noches</th><th>Habitación</th><th>Total</th><th>Canal</th><th>NPS</th></tr></thead>
+            <tbody>
+              <tr><td><strong>DOT Madrid Boutique</strong></td><td>14 Jun 25</td><td>17 Jun 25</td><td>3</td><td>Suite 412</td><td><strong>$960</strong></td><td>Booking.com</td><td><span class="badge badge-green">10/10</span></td></tr>
+              <tr><td>DOT Barcelona Centro</td><td>02 Feb 25</td><td>05 Feb 25</td><td>3</td><td>Deluxe 206</td><td>$525</td><td>Directo</td><td><span class="badge badge-green">9/10</span></td></tr>
+              <tr><td>DOT Roma Trastevere</td><td>15 Nov 24</td><td>20 Nov 24</td><td>5</td><td>Superior 301</td><td>$875</td><td>Expedia</td><td><span class="badge badge-green">9/10</span></td></tr>
+              <tr><td>DOT Madrid Boutique</td><td>22 Ago 24</td><td>24 Ago 24</td><td>2</td><td>Estándar 108</td><td>$280</td><td>Directo</td><td><span class="badge badge-yellow">7/10</span></td></tr>
+              <tr><td>DOT Buenos Aires</td><td>10 May 24</td><td>15 May 24</td><td>5</td><td>Deluxe 214</td><td>$620</td><td>Booking.com</td><td><span class="badge badge-green">10/10</span></td></tr>
+              <tr><td>DOT Miami Beach</td><td>03 Ene 24</td><td>07 Ene 24</td><td>4</td><td>Suite 504</td><td>$1,080</td><td>Directo</td><td><span class="badge badge-green">10/10</span></td></tr>
+              <tr><td>DOT Barcelona Centro</td><td>18 Sep 23</td><td>20 Sep 23</td><td>2</td><td>Estándar 103</td><td>$280</td><td>Airbnb</td><td><span class="badge badge-yellow">8/10</span></td></tr>
+              <tr><td>DOT Madrid Boutique</td><td>25 Mar 23</td><td>27 Mar 23</td><td>2</td><td>Superior 303</td><td>$340</td><td>Directo</td><td><span class="badge badge-green">10/10</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Notas del Equipo & Incidencias</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="padding:12px;background:#F9FAFB;border-radius:8px;border-left:3px solid #C8963E">
+            <div style="font-size:12px;font-weight:700;color:#111827">María González · 13 Jun 2025</div>
+            <div style="font-size:12px;color:#374151;margin-top:4px">Huésped solicitó almohada extra y botella de cava para su llegada mañana. Preferencia confirmada con housekeeping.</div>
+          </div>
+          <div style="padding:12px;background:#F9FAFB;border-radius:8px;border-left:3px solid #2563EB">
+            <div style="font-size:12px;font-weight:700;color:#111827">Carlos Ruiz · 02 Feb 2025</div>
+            <div style="font-size:12px;color:#374151;margin-top:4px">Upgrade cortesía otorgado a habitación Deluxe. Huésped agradeció detalle, dejó reseña 5 estrellas en Booking.</div>
+          </div>
+          <div style="padding:12px;background:#F9FAFB;border-radius:8px;border-left:3px solid #059669">
+            <div style="font-size:12px;font-weight:700;color:#111827">Sistema DOT FIRST · 22 Ago 2024</div>
+            <div style="font-size:12px;color:#374151;margin-top:4px">Huésped escalado a tier Gold automáticamente al acumular 5 estancias. Email de bienvenida enviado.</div>
+          </div>
+        </div>
+        <div style="margin-top:14px">
+          <textarea rows="2" placeholder="Añadir nota sobre este huésped..." style="resize:vertical"></textarea>
+          <div style="margin-top:8px;display:flex;justify-content:flex-end"><button class="btn btn-primary btn-sm">Guardar Nota</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SCREEN 6: BI REPORTES                                   -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="screen-bi" class="screen">
+  <div class="page-header">
+    <div class="page-title">BI Reportes</div>
+    <div class="page-sub">Análisis de performance, ingresos y distribución · Cadena DOT Hotels</div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Ingresos Totales YTD</div>
+      <div class="kpi-value">$3.29M</div>
+      <div class="kpi-delta delta-up">↑ +18.4% vs año anterior</div>
+    </div>
+    <div class="kpi-card" style="border-top-color:#059669">
+      <div class="kpi-label">RevPAR Promedio Cadena</div>
+      <div class="kpi-value">$112.40</div>
+      <div class="kpi-delta delta-up">↑ +9.2% vs año anterior</div>
+    </div>
+    <div class="kpi-card" style="border-top-color:#2563EB">
+      <div class="kpi-label">ADR Promedio Cadena</div>
+      <div class="kpi-value">$138.60</div>
+      <div class="kpi-delta delta-up">↑ +6.7% vs año anterior</div>
+    </div>
+    <div class="kpi-card" style="border-top-color:#7C3AED">
+      <div class="kpi-label">Ocupación Media</div>
+      <div class="kpi-value">81.1%</div>
+      <div class="kpi-delta delta-up">↑ +2.3pp vs año anterior</div>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">Ingresos Mensuales (Jun 2024 — May 2025)</div>
+        <div class="chart-subtitle">Cadena completa · Miles de USD</div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-outline btn-sm">Exportar CSV</button>
+        <button class="btn btn-outline btn-sm">Exportar PDF</button>
+      </div>
+    </div>
+    <svg id="bi-revenue-chart" viewBox="0 0 900 260" style="width:100%;display:block"></svg>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">Distribución por Canal</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+        <div class="channel-bar-row">
+          <div class="channel-bar-label">Booking.com</div>
+          <div class="channel-bar-track"><div class="channel-bar-fill" style="width:38%;background:#003580"></div></div>
+          <div class="channel-bar-pct">38%</div>
+        </div>
+        <div class="channel-bar-row">
+          <div class="channel-bar-label">Directo Web</div>
+          <div class="channel-bar-track"><div class="channel-bar-fill" style="width:22%;background:#C8963E"></div></div>
+          <div class="channel-bar-pct">22%</div>
+        </div>
+        <div class="channel-bar-row">
+          <div class="channel-bar-label">Expedia</div>
+          <div class="channel-bar-track"><div class="channel-bar-fill" style="width:18%;background:#FF5A00"></div></div>
+          <div class="channel-bar-pct">18%</div>
+        </div>
+        <div class="channel-bar-row">
+          <div class="channel-bar-label">Airbnb</div>
+          <div class="channel-bar-track"><div class="channel-bar-fill" style="width:12%;background:#FF385C"></div></div>
+          <div class="channel-bar-pct">12%</div>
+        </div>
+        <div class="channel-bar-row">
+          <div class="channel-bar-label">Otros</div>
+          <div class="channel-bar-track"><div class="channel-bar-fill" style="width:10%;background:#6B7280"></div></div>
+          <div class="channel-bar-pct">10%</div>
+        </div>
+      </div>
+      <div style="margin-top:16px;padding:12px;background:#FFFBEB;border-radius:8px;border:1px solid #FDE68A">
+        <div style="font-size:12px;font-weight:700;color:#92400E">💡 Insight DOT AI</div>
+        <div style="font-size:11px;color:#92400E;margin-top:4px">Canal directo creció +4pp vs año anterior. Cada punto porcentual adicional representa ~$32K en comisiones ahorradas.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Top 5 Propiedades por RevPAR</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Propiedad</th><th>País</th><th>RevPAR</th><th>vs Mes Ant.</th><th>Ocup.</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span style="font-size:18px">🥇</span></td>
+              <td><strong>DOT New York SoHo</strong></td>
+              <td>🇺🇸</td>
+              <td><strong>$189</strong></td>
+              <td style="color:#059669">+32%</td>
+              <td><span class="badge badge-green">95%</span></td>
+            </tr>
+            <tr>
+              <td><span style="font-size:18px">🥈</span></td>
+              <td>DOT Miami Beach</td>
+              <td>🇺🇸</td>
+              <td>$162</td>
+              <td style="color:#059669">+18%</td>
+              <td><span class="badge badge-green">91%</span></td>
+            </tr>
+            <tr>
+              <td><span style="font-size:18px">🥉</span></td>
+              <td>DOT Roma Trastevere</td>
+              <td>🇮🇹</td>
+              <td>$154</td>
+              <td style="color:#059669">+14%</td>
+              <td><span class="badge badge-green">89%</span></td>
+            </tr>
+            <tr>
+              <td><span style="font-size:14px;color:#9CA3AF">4</span></td>
+              <td>DOT Barcelona Centro</td>
+              <td>🇪🇸</td>
+              <td>$148</td>
+              <td style="color:#059669">+11%</td>
+              <td><span class="badge badge-green">87%</span></td>
+            </tr>
+            <tr>
+              <td><span style="font-size:14px;color:#9CA3AF">5</span></td>
+              <td>DOT Madrid Boutique</td>
+              <td>🇪🇸</td>
+              <td>$142</td>
+              <td style="color:#059669">+8%</td>
+              <td><span class="badge badge-green">91%</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:12px">
+        <div class="card-title" style="font-size:12px;margin-bottom:8px">Performance por País</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="padding:10px;background:#F9FAFB;border-radius:6px;text-align:center">
+            <div style="font-size:18px">🇺🇸</div>
+            <div style="font-size:11px;font-weight:700;color:#111827">USA</div>
+            <div style="font-size:16px;font-weight:800;color:#2563EB">$176</div>
+            <div style="font-size:10px;color:#059669">RevPAR · +24%</div>
+          </div>
+          <div style="padding:10px;background:#F9FAFB;border-radius:6px;text-align:center">
+            <div style="font-size:18px">🇮🇹</div>
+            <div style="font-size:11px;font-weight:700;color:#111827">Italia</div>
+            <div style="font-size:16px;font-weight:800;color:#2563EB">$149</div>
+            <div style="font-size:10px;color:#059669">RevPAR · +12%</div>
+          </div>
+          <div style="padding:10px;background:#F9FAFB;border-radius:6px;text-align:center">
+            <div style="font-size:18px">🇪🇸</div>
+            <div style="font-size:11px;font-weight:700;color:#111827">España</div>
+            <div style="font-size:16px;font-weight:800;color:#2563EB">$138</div>
+            <div style="font-size:10px;color:#059669">RevPAR · +9%</div>
+          </div>
+          <div style="padding:10px;background:#F9FAFB;border-radius:6px;text-align:center">
+            <div style="font-size:18px">🌎</div>
+            <div style="font-size:11px;font-weight:700;color:#111827">LATAM</div>
+            <div style="font-size:16px;font-weight:800;color:#2563EB">$82</div>
+            <div style="font-size:10px;color:#059669">RevPAR · +16%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SCREEN 7: CONFIGURACIÓN                                 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="screen-config" class="screen">
+  <div class="page-header">
+    <div class="page-title">Configuración</div>
+    <div class="page-sub">Administración del sistema, usuarios y preferencias de la plataforma DOT FIRST</div>
+  </div>
+
+  <div class="system-banner">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:36px;height:36px;background:rgba(200,150,62,0.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px">⚙️</div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:#F9FAFB">DOT FIRST Platform v2.14.1</div>
+        <div style="font-size:11px;color:#9CA3AF">Última actualización: 10 Jun 2025 · Build 4892 · Servidor: AWS us-east-1 · Uptime: 99.98%</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:20px">
+      <div style="text-align:center"><div style="font-size:18px;font-weight:800;color:#C8963E">54</div><div style="font-size:10px;color:#9CA3AF">Propiedades</div></div>
+      <div style="text-align:center"><div style="font-size:18px;font-weight:800;color:#34D399">99.98%</div><div style="font-size:10px;color:#9CA3AF">Uptime</div></div>
+      <div style="text-align:center"><div style="font-size:18px;font-weight:800;color:#60A5FA">12</div><div style="font-size:10px;color:#9CA3AF">Integraciones</div></div>
+    </div>
+  </div>
+
+  <div class="tabs-bar" style="margin-bottom:20px">
+    <button class="tab-btn active" id="config-tab-btn-general" onclick="showConfigTab('config-general',this)">General</button>
+    <button class="tab-btn" id="config-tab-btn-users" onclick="showConfigTab('config-users',this)">Usuarios</button>
+    <button class="tab-btn" id="config-tab-btn-integrations" onclick="showConfigTab('config-integrations',this)">Integraciones</button>
+    <button class="tab-btn" id="config-tab-btn-notifs" onclick="showConfigTab('config-notifs',this)">Notificaciones</button>
+  </div>
+
+  <!-- TAB: GENERAL -->
+  <div id="config-general" class="config-tab">
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">Información de la Cadena</div>
+        <div style="display:grid;gap:14px">
+          <div><label class="form-label">Nombre de la cadena</label><input type="text" value="DOT Hotels International" style="width:100%"></div>
+          <div><label class="form-label">Sitio web oficial</label><input type="text" value="https://www.dothotels.com" style="width:100%"></div>
+          <div><label class="form-label">Email de soporte</label><input type="text" value="soporte@dothotels.com" style="width:100%"></div>
+          <div class="two-col" style="gap:12px">
+            <div><label class="form-label">País sede</label><input type="text" value="España" style="width:100%"></div>
+            <div><label class="form-label">Moneda principal</label><input type="text" value="USD" style="width:100%"></div>
+          </div>
+          <div class="two-col" style="gap:12px">
+            <div><label class="form-label">Zona horaria</label><input type="text" value="Europe/Madrid (UTC+2)" style="width:100%"></div>
+            <div><label class="form-label">Idioma por defecto</label><input type="text" value="Español" style="width:100%"></div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:4px">
+            <button class="btn btn-outline btn-sm">Cancelar</button>
+            <button class="btn btn-primary btn-sm" onclick="showToast('Configuración guardada correctamente')">Guardar Cambios</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Parámetros de Facturación</div>
+        <div style="display:grid;gap:14px">
+          <div><label class="form-label">Plan actual</label><div style="display:flex;align-items:center;gap:10px"><input type="text" value="DOT FIRST Enterprise" style="width:100%" readonly><span class="badge badge-green">Activo</span></div></div>
+          <div class="two-col" style="gap:12px">
+            <div><label class="form-label">Propiedades activas</label><input type="text" value="54 / 60 licencias" style="width:100%" readonly></div>
+            <div><label class="form-label">Ciclo de facturación</label><input type="text" value="Anual (Jun 2025)" style="width:100%" readonly></div>
+          </div>
+          <div><label class="form-label">Próxima renovación</label><input type="text" value="01 Jun 2026" style="width:100%" readonly></div>
+          <div><label class="form-label">Método de pago</label><input type="text" value="SEPA Directo · BBVA ES91 0182 ****" style="width:100%" readonly></div>
+          <div style="padding:12px;background:#ECFDF5;border-radius:8px;border:1px solid #6EE7B7">
+            <div style="font-size:12px;font-weight:700;color:#065F46">Plan Enterprise — Funcionalidades activas</div>
+            <div style="font-size:11px;color:#065F46;margin-top:6px;display:grid;grid-template-columns:1fr 1fr;gap:4px">
+              <div>✓ PMS multisede ilimitado</div>
+              <div>✓ Revenue Engine AI</div>
+              <div>✓ CRM & Loyalty Program</div>
+              <div>✓ BI Reportes avanzados</div>
+              <div>✓ API acceso completo</div>
+              <div>✓ Soporte 24/7 SLA 2h</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: USUARIOS -->
+  <div id="config-users" class="config-tab" style="display:none">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div class="card-title" style="margin-bottom:0">Usuarios del Sistema <span class="badge badge-blue">6 activos</span></div>
+        <button class="btn btn-primary btn-sm">+ Nuevo Usuario</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Usuario</th><th>Email</th><th>Rol</th><th>Propiedades</th><th>Último acceso</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:50%;background:#C8963E;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff">MG</div><div><div style="font-size:13px;font-weight:600">María González</div><div style="font-size:11px;color:#6B7280">Directora de Operaciones</div></div></div></td>
+              <td style="font-size:12px">m.gonzalez@dothotels.com</td>
+              <td><span class="badge badge-purple">Super Admin</span></td>
+              <td><span class="badge badge-blue">Todas (54)</span></td>
+              <td style="font-size:12px">Hoy 09:45</td>
+              <td><span class="badge badge-green">Activo</span></td>
+              <td><button class="btn btn-outline btn-sm">Editar</button></td>
+            </tr>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:50%;background:#2563EB;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff">CR</div><div><div style="font-size:13px;font-weight:600">Carlos Ruiz</div><div style="font-size:11px;color:#6B7280">Revenue Manager</div></div></div></td>
+              <td style="font-size:12px">c.ruiz@dothotels.com</td>
+              <td><span class="badge badge-gold">Revenue Admin</span></td>
+              <td><span class="badge badge-blue">Todas (54)</span></td>
+              <td style="font-size:12px">Ayer 18:22</td>
+              <td><span class="badge badge-green">Activo</span></td>
+              <td><button class="btn btn-outline btn-sm">Editar</button></td>
+            </tr>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:50%;background:#059669;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff">AL</div><div><div style="font-size:13px;font-weight:600">Andrea López</div><div style="font-size:11px;color:#6B7280">Front Desk — Madrid</div></div></div></td>
+              <td style="font-size:12px">a.lopez@dothotels.com</td>
+              <td><span class="badge badge-green">Recepcionista</span></td>
+              <td style="font-size:12px">DOT Madrid (2)</td>
+              <td style="font-size:12px">Hoy 08:30</td>
+              <td><span class="badge badge-green">Activo</span></td>
+              <td><button class="btn btn-outline btn-sm">Editar</button></td>
+            </tr>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:50%;background:#7C3AED;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff">JM</div><div><div style="font-size:13px;font-weight:600">José Martínez</div><div style="font-size:11px;color:#6B7280">Housekeeping Manager</div></div></div></td>
+              <td style="font-size:12px">j.martinez@dothotels.com</td>
+              <td><span class="badge badge-blue">Housekeeping</span></td>
+              <td style="font-size:12px">DOT Madrid Boutique</td>
+              <td style="font-size:12px">Hoy 07:15</td>
+              <td><span class="badge badge-green">Activo</span></td>
+              <td><button class="btn btn-outline btn-sm">Editar</button></td>
+            </tr>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:50%;background:#DC2626;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff">IS</div><div><div style="font-size:13px;font-weight:600">Isabel Sánchez</div><div style="font-size:11px;color:#6B7280">Analista BI</div></div></div></td>
+              <td style="font-size:12px">i.sanchez@dothotels.com</td>
+              <td><span class="badge badge-yellow">Analista</span></td>
+              <td><span class="badge badge-blue">Todas (54)</span></td>
+              <td style="font-size:12px">Jun 12, 14:30</td>
+              <td><span class="badge badge-green">Activo</span></td>
+              <td><button class="btn btn-outline btn-sm">Editar</button></td>
+            </tr>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:50%;background:#6B7280;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff">RP</div><div><div style="font-size:13px;font-weight:600">Roberto Pérez</div><div style="font-size:11px;color:#6B7280">Channel Manager Ext.</div></div></div></td>
+              <td style="font-size:12px">r.perez@agency.com</td>
+              <td><span class="badge">Externo</span></td>
+              <td style="font-size:12px">Barcelona, NY</td>
+              <td style="font-size:12px">Jun 10, 09:00</td>
+              <td><span class="badge badge-yellow">Pendiente</span></td>
+              <td><button class="btn btn-outline btn-sm">Editar</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: INTEGRACIONES -->
+  <div id="config-integrations" class="config-tab" style="display:none">
+    <div class="integrations-grid">
+      <div class="integration-card"><div class="integration-icon" style="background:#003580;color:white;font-size:10px;font-weight:800">BDC</div><div class="integration-name">Booking.com</div><span class="badge badge-green">Conectado</span><div class="integration-detail">API v3 · 54 props · Sync en tiempo real</div></div>
+      <div class="integration-card"><div class="integration-icon" style="background:#FF5A00;color:white;font-size:11px;font-weight:800">EXP</div><div class="integration-name">Expedia Group</div><span class="badge badge-green">Conectado</span><div class="integration-detail">API v2 · 54 props · Sync 15min</div></div>
+      <div class="integration-card"><div class="integration-icon" style="background:#FF385C;color:white;font-size:11px;font-weight:800">AIR</div><div class="integration-name">Airbnb</div><span class="badge badge-green">Conectado</span><div class="integration-detail">iCal + API · 38 props · Sync 30min</div></div>
+      <div class="integration-card"><div class="integration-icon" style="background:#34A853;color:white;font-size:11px;font-weight:800">GHA</div><div class="integration-name">Google Hotel Ads</div><span class="badge badge-green">Conectado</span><div class="integration-detail">Google Ads API · 54 props · Activo</div></div>
+      <div class="integration-card"><div class="integration-icon" style="background:#1D72B8;color:white;font-size:10px;font-weight:800">HRS</div><div class="integration-name">HRS Corporate</div><span class="badge badge-green">Conectado</span><div class="integration-detail">XML API · 40 props · Empresarial</div></div>
+      <div class="integration-card"><div class="integration-icon" style="background:#8B5CF6;color:white;font-size:10px;font-weight:800">SMR</div><div class="integration-name">SiteMinder</div><span class="badge badge-green">Conectado</span><div class="integration-detail">Channel Manager · CM Hub activo</div></div>
+      <div class="integration-card"><div class="integration-icon" style="background:#0EA5E9;color:white;font-size:10px;font-weight:800">TWL</div><div class="integration-name">TravelClick</div><span class="badge badge-yellow">Parcial</span><div class="integration-detail">iCal · 22 props · Rev. Manager</div></div>
+      <div class="integration-card"><div class="integration-icon" style="background:#059669;color:white;font-size:10px;font-weight:800">STR</div><div class="integration-name">STR Benchmarking</div><span class="badge badge-green">Conectado</span><div class="integration-detail">STR API · Comp-set 54 props</div></div>
+      <div class="integration-card"><div class="integration-icon" style="background:#F59E0B;color:white;font-size:10px;font-weight:800">QBO</div><div class="integration-name">QuickBooks</div><span class="badge badge-green">Conectado</span><div class="integration-detail">Contabilidad automática · Activo</div></div>
+      <div class="integration-card"><div class="integration-icon" style="background:#374151;color:white;font-size:10px;font-weight:800">SFR</div><div class="integration-name">Salesforce CRM</div><span class="badge badge-yellow">Config.</span><div class="integration-detail">CRM Sync · En configuración</div></div>
+      <div class="integration-card"><div class="integration-icon" style="background:#DC2626;color:white;font-size:10px;font-weight:800">WHS</div><div class="integration-name">Webhook Alerts</div><span class="badge badge-green">Activo</span><div class="integration-detail">Slack + Teams · 8 webhooks</div></div>
+      <div class="integration-card"><div class="integration-icon" style="background:#1F2937;color:white;font-size:10px;font-weight:800">API</div><div class="integration-name">REST API Pública</div><span class="badge badge-green">Activo</span><div class="integration-detail">v2.14 · Docs en developer.dothotels.com</div></div>
+    </div>
+  </div>
+
+  <!-- TAB: NOTIFICACIONES -->
+  <div id="config-notifs" class="config-tab" style="display:none">
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">Alertas del Sistema</div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="notif-row"><div><div style="font-size:13px;font-weight:600">Caída de conectividad de canal</div><div style="font-size:11px;color:#6B7280">Email + Slack inmediato si un OTA pierde conexión</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+          <div class="notif-row"><div><div style="font-size:13px;font-weight:600">Disparidad de precios detectada</div><div style="font-size:11px;color:#6B7280">Alerta si hay diferencia >10% entre canales</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+          <div class="notif-row"><div><div style="font-size:13px;font-weight:600">Overbooking detectado</div><div style="font-size:11px;color:#6B7280">Notificación crítica inmediata a equipo</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+          <div class="notif-row"><div><div style="font-size:13px;font-weight:600">Nuevas reservas (>$500)</div><div style="font-size:11px;color:#6B7280">Resumen cada hora por email</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+          <div class="notif-row"><div><div style="font-size:13px;font-weight:600">Reseñas negativas (≤3 estrellas)</div><div style="font-size:11px;color:#6B7280">Alerta inmediata por email y Slack</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Reportes Automáticos</div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="notif-row"><div><div style="font-size:13px;font-weight:600">Reporte diario de ocupación</div><div style="font-size:11px;color:#6B7280">Enviado a las 8:00 AM por email</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+          <div class="notif-row"><div><div style="font-size:13px;font-weight:600">Reporte semanal de Revenue</div><div style="font-size:11px;color:#6B7280">Lunes 9:00 AM — resumen de la semana</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+          <div class="notif-row"><div><div style="font-size:13px;font-weight:600">Reporte mensual BI</div><div style="font-size:11px;color:#6B7280">Día 1 de cada mes — análisis completo</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+          <div class="notif-row"><div><div style="font-size:13px;font-weight:600">Alertas de RevPAR objetivo</div><div style="font-size:11px;color:#6B7280">Si RevPAR cae >5% bajo objetivo</div></div><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div>
+          <div class="notif-row"><div><div style="font-size:13px;font-weight:600">Notificaciones de sistema</div><div style="font-size:11px;color:#6B7280">Updates, mantenimiento, changelog</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+        </div>
+        <div style="margin-top:16px;display:flex;justify-content:flex-end">
+          <button class="btn btn-primary btn-sm" onclick="showToast('Preferencias de notificación guardadas')">Guardar Preferencias</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Developer credit -->
+  <div style="margin-top:40px;padding:20px;text-align:center;border-top:1px solid #E5E7EB">
+    <div style="font-size:12px;color:#9CA3AF">DOT FIRST Platform — Desarrollado por <strong style="color:#C8963E">IT4W</strong> · &copy; 2025 DOT Hotels International · Todos los derechos reservados</div>
+    <div style="font-size:11px;color:#D1D5DB;margin-top:4px">Enterprise Hospitality Management Suite · v2.14.1 · <a href="#" style="color:#C8963E;text-decoration:none">Documentación API</a> · <a href="#" style="color:#C8963E;text-decoration:none">Soporte</a></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- END MAIN                                                -->
+<!-- ═══════════════════════════════════════════════════════ -->
+</div><!-- /main -->
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- MODAL: CHECK-IN                                         -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="check-in-modal" class="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title">Confirmar Check-in</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+        <div><label class="form-label">Huésped</label><input type="text" value="Lucas Fernández" readonly></div>
+        <div><label class="form-label">Habitación</label><input type="text" value="412 — Suite Premium" readonly></div>
+        <div><label class="form-label">Check-in</label><input type="text" value="15 Jun 2025" readonly></div>
+        <div><label class="form-label">Check-out</label><input type="text" value="18 Jun 2025" readonly></div>
+        <div><label class="form-label">Reserva #</label><input type="text" value="DOT-8829142" readonly></div>
+        <div><label class="form-label">Total</label><input type="text" value="$960 USD" readonly></div>
+      </div>
+      <div style="padding:12px;background:#FFFBEB;border-radius:8px;border:1px solid #FDE68A;margin-bottom:16px">
+        <div style="font-size:12px;font-weight:700;color:#92400E">⭐ Gold Member — Preferencias del huésped</div>
+        <div style="font-size:11px;color:#92400E;margin-top:6px">Planta alta · Almohada extra · Vista ciudad · Check-in tardío · Sin alérgenos</div>
+      </div>
+      <div style="margin-bottom:14px">
+        <label class="form-label">Notas de bienvenida</label>
+        <textarea rows="3" placeholder="Instrucciones especiales o notas para el equipo de recepción...">Preparar cava de bienvenida. Upgrade cortesía aprobado a Suite 412.</textarea>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:12px;background:#F9FAFB;border-radius:8px;margin-bottom:16px">
+        <input type="checkbox" id="modal-checklist-docs" checked style="width:16px;height:16px;accent-color:#C8963E">
+        <label for="modal-checklist-docs" style="font-size:13px;color:#374151;cursor:pointer">Documentación verificada (pasaporte / DNI)</label>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:12px;background:#F9FAFB;border-radius:8px">
+        <input type="checkbox" id="modal-checklist-payment" checked style="width:16px;height:16px;accent-color:#C8963E">
+        <label for="modal-checklist-payment" style="font-size:13px;color:#374151;cursor:pointer">Método de pago confirmado · Visa ****4821</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="closeModal();showToast('Check-in confirmado para Lucas Fernández — Hab. 412')">✓ Confirmar Check-in</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TOAST                                                    -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="toast" class="toast">
+  <div style="display:flex;align-items:center;gap:10px">
+    <span style="font-size:16px">✓</span>
+    <span id="toast-text">Operación completada</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- STATUS BAR                                              -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="status-bar">
+  <div class="status-item"><span class="status-dot green"></span>API Connected</div>
+  <div class="status-item"><span class="status-dot green"></span>54 Propiedades</div>
+  <div class="status-item"><span class="status-dot gold"></span>Sync hace 2 min</div>
+  <div class="status-item" style="margin-left:auto;color:#6B7280">DOT FIRST v2.14.1 · IT4W &copy; 2025</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════
+function showScreen(screenId, title, navEl) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  var target = document.getElementById(screenId);
+  if (target) target.classList.add('active');
+  var bc = document.getElementById('breadcrumb-text');
+  if (bc) bc.textContent = title;
+  if (navEl) navEl.classList.add('active');
+}
+
+function showPmsTab(tabId, tabEl) {
+  document.querySelectorAll('.pms-tab').forEach(t => { t.style.display = 'none'; });
+  var target = document.getElementById(tabId);
+  if (target) target.style.display = 'block';
+  var parent = tabEl ? tabEl.closest('.tabs-bar') : null;
+  if (parent) parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  if (tabEl) tabEl.classList.add('active');
+}
+
+function showConfigTab(tabId, tabEl) {
+  document.querySelectorAll('.config-tab').forEach(t => { t.style.display = 'none'; });
+  var target = document.getElementById(tabId);
+  if (target) target.style.display = 'block';
+  var parent = tabEl ? tabEl.closest('.tabs-bar') : null;
+  if (parent) parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  if (tabEl) tabEl.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════
+//  MODAL
+// ═══════════════════════════════════════════════════
+function openModal() {
+  var m = document.getElementById('check-in-modal');
+  if (m) m.classList.add('open');
+}
+
+function closeModal() {
+  var m = document.getElementById('check-in-modal');
+  if (m) m.classList.remove('open');
+}
+
+// ═══════════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════════
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  var txt = document.getElementById('toast-text');
+  if (!t) return;
+  if (txt) txt.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 3000);
+}
+
+// ═══════════════════════════════════════════════════
+//  CHART: DASHBOARD OCCUPANCY BAR CHART
+// ═══════════════════════════════════════════════════
+function drawDashboardChart() {
+  var svg = document.getElementById('dashboard-chart');
+  if (!svg) return;
+  var data = [62,58,71,88,92,90,65,60,55,73,85,91,89,68,63,57,74,86,92,90,67,61,58,76,88,93,91,70,64,59];
+  var W = 700, H = 200;
+  var xStart = 50, xEnd = 695, yTop = 15, yBottom = 175;
+  var chartH = yBottom - yTop;
+  var slotW = (xEnd - xStart) / data.length;
+  var barW = 14;
+  var maxVal = 100;
+  var html = '';
+  // Y grid lines
+  [0,25,50,75,100].forEach(function(v) {
+    var y = yBottom - (v / maxVal) * chartH;
+    var color = v === 0 ? '#E5E7EB' : '#F3F4F6';
+    html += '<line x1="' + xStart + '" y1="' + y + '" x2="' + xEnd + '" y2="' + y + '" stroke="' + color + '" stroke-width="1"/>';
+    html += '<text x="44" y="' + (y + 4) + '" fill="#9CA3AF" font-size="10" text-anchor="end">' + v + '%</text>';
+  });
+  // Dashed 75% line
+  var y75 = yBottom - (75 / maxVal) * chartH;
+  html += '<line x1="' + xStart + '" y1="' + y75 + '" x2="' + xEnd + '" y2="' + y75 + '" stroke="#C8963E" stroke-width="1.5" stroke-dasharray="5,3"/>';
+  html += '<text x="' + (xEnd + 4) + '" y="' + (y75 + 4) + '" fill="#C8963E" font-size="9">75%</text>';
+  // Bars
+  var xLabels = {0:'D1',5:'D6',10:'D11',15:'D16',20:'D21',25:'D26',29:'D30'};
+  data.forEach(function(val, i) {
+    var x = xStart + i * slotW + (slotW - barW) / 2;
+    var barH = (val / maxVal) * chartH;
+    var y = yBottom - barH;
+    var color = val >= 90 ? '#C8963E' : val >= 75 ? '#2563EB' : val >= 60 ? '#059669' : '#9CA3AF';
+    html += '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + barH + '" fill="' + color + '" rx="2" opacity="0.85"/>';
+    if (xLabels[i] !== undefined) {
+      html += '<text x="' + (x + barW/2) + '" y="' + (yBottom + 12) + '" fill="#9CA3AF" font-size="9" text-anchor="middle">' + xLabels[i] + '</text>';
+    }
+  });
+  svg.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════
+//  CHART: REVPAR FORECAST LINE CHART
+// ═══════════════════════════════════════════════════
+function drawRevParChart() {
+  var svg = document.getElementById('revpar-chart');
+  if (!svg) return;
+  var projected = [88,84,96,118,125,112,90,86,82,98,122,130,115,92,88,85,100,125,138,120,95,91,87,102,128,140,135,105,94,88,85];
+  var historical = [82,78,90,108,115,105,85,80,78,92,112,120,108,88,84,80,94,118,128,112,90,86,82,96,118,130,125,98,88,82,80];
+  var W = 900, H = 220;
+  var xStart = 60, xEnd = 880, yTop = 20, yBottom = 190;
+  var chartW = xEnd - xStart, chartH = yBottom - yTop;
+  var yMin = 60, yMax = 150;
+  var n = projected.length;
+  var xStep = chartW / (n - 1);
+  var html = '';
+  function px(i) { return xStart + i * xStep; }
+  function py(v) { return yBottom - ((v - yMin) / (yMax - yMin)) * chartH; }
+  // Grid
+  [60,75,90,105,120,135,150].forEach(function(v) {
+    var y = py(v);
+    html += '<line x1="' + xStart + '" y1="' + y + '" x2="' + xEnd + '" y2="' + y + '" stroke="#F3F4F6" stroke-width="1"/>';
+    html += '<text x="54" y="' + (y + 4) + '" fill="#9CA3AF" font-size="10" text-anchor="end">$' + v + '</text>';
+  });
+  // Historical line (gray dashed)
+  var histPath = historical.map(function(v,i){ return (i===0?'M':'L') + px(i) + ',' + py(v); }).join(' ');
+  html += '<path d="' + histPath + '" fill="none" stroke="#D1D5DB" stroke-width="2" stroke-dasharray="6,3"/>';
+  // Area fill under projected
+  var areaPath = projected.map(function(v,i){ return (i===0?'M':'L') + px(i) + ',' + py(v); }).join(' ');
+  areaPath += ' L' + px(n-1) + ',' + yBottom + ' L' + xStart + ',' + yBottom + ' Z';
+  html += '<path d="' + areaPath + '" fill="#2563EB" opacity="0.07"/>';
+  // Projected line (blue)
+  var projPath = projected.map(function(v,i){ return (i===0?'M':'L') + px(i) + ',' + py(v); }).join(' ');
+  html += '<path d="' + projPath + '" fill="none" stroke="#2563EB" stroke-width="2.5"/>';
+  // Data points
+  projected.forEach(function(v,i) {
+    if (i % 5 === 0 || i === n-1) {
+      html += '<circle cx="' + px(i) + '" cy="' + py(v) + '" r="4" fill="#2563EB"/>';
+      html += '<text x="' + px(i) + '" y="' + (py(v) - 8) + '" fill="#2563EB" font-size="10" text-anchor="middle">$' + v + '</text>';
+      html += '<text x="' + px(i) + '" y="' + (yBottom + 13) + '" fill="#9CA3AF" font-size="9" text-anchor="middle">D' + (i+1) + '</text>';
+    }
+  });
+  svg.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════
+//  CHART: BI MONTHLY REVENUE BAR CHART
+// ═══════════════════════════════════════════════════
+function drawBIRevenueChart() {
+  var svg = document.getElementById('bi-revenue-chart');
+  if (!svg) return;
+  var values = [180,210,195,240,280,320,290,310,275,260,295,328];
+  var months = ['Jun','Jul','Ago','Sep','Oct','Nov','Dic','Ene','Feb','Mar','Abr','May'];
+  var xStart = 60, xEnd = 880, yTop = 20, yBottom = 220;
+  var chartH = yBottom - yTop;
+  var maxVal = 350;
+  var n = values.length;
+  var slotW = (xEnd - xStart) / n;
+  var barW = slotW * 0.55;
+  var html = '';
+  // Grid
+  [0,100,200,300].forEach(function(v) {
+    var y = yBottom - (v / maxVal) * chartH;
+    html += '<line x1="' + xStart + '" y1="' + y + '" x2="' + xEnd + '" y2="' + y + '" stroke="#F3F4F6" stroke-width="1"/>';
+    html += '<text x="54" y="' + (y + 4) + '" fill="#9CA3AF" font-size="10" text-anchor="end">$' + v + 'K</text>';
+  });
+  values.forEach(function(v, i) {
+    var x = xStart + i * slotW + (slotW - barW) / 2;
+    var barH = (v / maxVal) * chartH;
+    var y = yBottom - barH;
+    var color = v === Math.max.apply(null, values) ? '#C8963E' : '#2563EB';
+    html += '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + barH + '" fill="' + color + '" rx="3" opacity="0.85"/>';
+    html += '<text x="' + (x + barW/2) + '" y="' + (y - 5) + '" fill="#374151" font-size="11" text-anchor="middle" font-weight="600">$' + v + 'K</text>';
+    html += '<text x="' + (x + barW/2) + '" y="' + (yBottom + 14) + '" fill="#6B7280" font-size="11" text-anchor="middle">' + months[i] + '</text>';
+  });
+  svg.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════
+//  CHART: CHANNEL DONUT
+// ═══════════════════════════════════════════════════
+function polarToCartesian(cx, cy, r, angleDeg) {
+  var rad = (angleDeg - 90) * Math.PI / 180;
+  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+}
+
+function arcPath(cx, cy, outerR, innerR, startAngle, endAngle) {
+  var o1 = polarToCartesian(cx, cy, outerR, endAngle);
+  var o2 = polarToCartesian(cx, cy, outerR, startAngle);
+  var i1 = polarToCartesian(cx, cy, innerR, endAngle);
+  var i2 = polarToCartesian(cx, cy, innerR, startAngle);
+  var large = endAngle - startAngle > 180 ? 1 : 0;
+  return [
+    'M', o2.x, o2.y,
+    'A', outerR, outerR, 0, large, 1, o1.x, o1.y,
+    'L', i1.x, i1.y,
+    'A', innerR, innerR, 0, large, 0, i2.x, i2.y,
+    'Z'
+  ].join(' ');
+}
+
+function drawDonutChart() {
+  var svg = document.getElementById('channel-donut');
+  if (!svg) return;
+  var cx = 100, cy = 100, outerR = 80, innerR = 48;
+  var segments = [
+    { label: 'Booking.com', pct: 38, color: '#003580' },
+    { label: 'Directo',     pct: 22, color: '#C8963E' },
+    { label: 'Expedia',     pct: 18, color: '#FF5A00' },
+    { label: 'Airbnb',      pct: 12, color: '#FF385C' },
+    { label: 'Otros',       pct: 10, color: '#6B7280' }
+  ];
+  var html = '';
+  var start = 0;
+  segments.forEach(function(seg) {
+    var end = start + (seg.pct / 100) * 360;
+    html += '<path d="' + arcPath(cx, cy, outerR, innerR, start, end) + '" fill="' + seg.color + '"/>';
+    start = end;
+  });
+  // Center label
+  html += '<text x="100" y="96" fill="#111827" font-size="14" font-weight="700" text-anchor="middle">Canales</text>';
+  html += '<text x="100" y="113" fill="#6B7280" font-size="11" text-anchor="middle">Distribución</text>';
+  // Legend
+  var ly = 20;
+  segments.forEach(function(seg) {
+    html += '<rect x="210" y="' + (ly - 9) + '" width="12" height="12" fill="' + seg.color + '" rx="2"/>';
+    html += '<text x="228" y="' + ly + '" fill="#374151" font-size="12">' + seg.label + ' ' + seg.pct + '%</text>';
+    ly += 22;
+  });
+  svg.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+  drawDashboardChart();
+  drawRevParChart();
+  drawBIRevenueChart();
+  drawDonutChart();
+});
+</script>
+</body>
+</html>
